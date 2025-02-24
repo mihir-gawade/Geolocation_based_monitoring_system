@@ -1,7 +1,8 @@
 package com.example.app006.employee;
 
+import android.content.Intent;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
+import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import com.example.app006.R;
@@ -13,6 +14,18 @@ public class EmployeeActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_employee);
+
+        // Get the welcome text view
+        TextView welcomeText = findViewById(R.id.welcome_text);
+
+        // Get the user's name from Intent or SharedPreferences
+        String userName = getIntent().getStringExtra("USER_NAME");
+        if (userName == null || userName.isEmpty()) {
+            userName = "Employee";  // Default if name is not provided
+        }
+
+        // Update the TextView with the user's name
+        welcomeText.setText("Welcome, " + userName);
 
         BottomNavigationView bottomNavigationView = findViewById(R.id.employee_bottom_navigation);
 

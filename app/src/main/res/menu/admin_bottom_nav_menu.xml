@@ -12,8 +12,8 @@
         android:title="Reports and Dashboards" />
 
     <item
-        android:id="@+id/nav_attendance"
+        android:id="@+id/nav_profile"
         android:icon="@drawable/ic_search"
-        android:title="Attendance" />
+        android:title="Profile" />
 
 </menu>

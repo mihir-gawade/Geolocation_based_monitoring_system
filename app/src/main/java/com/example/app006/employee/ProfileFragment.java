@@ -1,93 +1,56 @@
 package com.example.app006.employee;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.TextView;
-import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import com.example.app006.R;
 import com.example.app006.auth.LoginActivity;
+import com.example.app006.R;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
 public class ProfileFragment extends Fragment {
-
-    private TextView employeeName, employeeEmail, employeeRole, employeeId;
     private Button logoutButton;
     private FirebaseAuth auth;
-    private DatabaseReference reference;
-    private String userId;
 
+    @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.employee_profile, container, false);
-    }
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.employee_profile, container, false);
 
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
+        // Initialize Firebase Auth
+        auth = FirebaseAuth.getInstance();
 
-        // Initialize UI components
-        employeeName = view.findViewById(R.id.employee_name);
-        employeeEmail = view.findViewById(R.id.employee_email);
-        employeeRole = view.findViewById(R.id.employee_role);
-        employeeId = view.findViewById(R.id.employee_id);
+        // Initialize logout button
         logoutButton = view.findViewById(R.id.logout_button);
 
-        // Initialize Firebase
-        auth = FirebaseAuth.getInstance();
-        FirebaseUser user = auth.getCurrentUser();
+        // Set logout button click listener
+        logoutButton.setOnClickListener(v -> logoutUser());
 
-        if (user != null) {
-            userId = user.getUid(); // Get current user's ID
-            reference = FirebaseDatabase.getInstance().getReference("users").child(userId); // Correct reference
+        return view;
+    }
 
-            // Retrieve user data
-            reference.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    if (snapshot.exists()) {
-                        String name = snapshot.child("name").getValue(String.class);
-                        String email = snapshot.child("email").getValue(String.class);
-                        String role = snapshot.child("userType").getValue(String.class);
-                        String empId = snapshot.child("username").getValue(String.class);
+    private void logoutUser() {
+        if (getActivity() == null) return; // Prevent null pointer exception
 
-                        if (name != null) employeeName.setText(name);
-                        if (email != null) employeeEmail.setText("Email: " + email);
-                        if (role != null) employeeRole.setText("Role: " + role);
-                        if (empId != null) employeeId.setText("Employee ID: " + empId);
-                    } else {
-                        Toast.makeText(getContext(), "User data not found", Toast.LENGTH_SHORT).show();
-                    }
-                }
+        // Sign out from Firebase
+        auth.signOut();
 
-                @Override
-                public void onCancelled(@NonNull DatabaseError error) {
-                    Toast.makeText(getContext(), "Failed to load profile", Toast.LENGTH_SHORT).show();
-                }
-            });
-        } else {
-            Toast.makeText(getContext(), "User not logged in", Toast.LENGTH_SHORT).show();
-        }
+        // Clear SharedPreferences
+        SharedPreferences sharedPreferences = getActivity().getSharedPreferences("LoginPrefs", getActivity().MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.clear();
+        editor.apply();
 
-        // Logout functionality
-        logoutButton.setOnClickListener(v -> {
-            auth.signOut();
-            startActivity(new Intent(getActivity(), LoginActivity.class));
-            getActivity().finish();
-        });
+        // Redirect to LoginActivity
+        Intent intent = new Intent(getActivity(), LoginActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
     }
 }
