@@ -7,16 +7,9 @@
     android:background="@color/white">
 
     <ImageView
-        android:layout_width="200dp"
-        android:layout_height="200dp"
-        android:src="@drawable/ic_profile"
-        android:contentDescription="App Logo"/>
+        android:layout_width="259dp"
+        android:layout_height="219dp"
+        android:contentDescription="App Logo"
+        android:src="@drawable/logo" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Welcome..."
-        android:textSize="50sp"
-        android:textStyle="bold"
-        android:layout_marginTop="20dp"/>
 </LinearLayout>

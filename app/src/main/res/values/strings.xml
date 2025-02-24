@@ -1,5 +1,10 @@
 <resources>
-    <string name="app_name">app006</string>
+    <string name="app_name">GeoTrack</string>
+
+
+    <string name="open_nav">Open Navigation Drawer</string>
+    <string name="close_nav">Close Navigation Drawer</string>
+
     <string-array name="user_types">
         <item>Select User Type</item>
         <item>Admin</item>
