@@ -5,6 +5,14 @@
     <!-- Location Permissions -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
+
+    <!-- Foreground Service Permission (Required for Android 14+) -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION" />
+
+    <!-- Optional: Prevent the OS from killing the background service -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
 
     <application
         android:allowBackup="true"
@@ -15,7 +23,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.App006"
-        tools:targetApi="31">
+        tools:targetApi="33">
 
         <!-- Splash Screen (Launcher Activity) -->
         <activity
@@ -27,14 +35,19 @@
             </intent-filter>
         </activity>
 
-        <!-- Login Activity (Removed Duplicate Intent-Filter & launchMode) -->
-        <activity android:name=".auth.LoginActivity"
-            android:exported="true"/>
-
+        <!-- Auth Activities -->
+        <activity android:name=".auth.LoginActivity" android:exported="true"/>
         <activity android:name=".auth.SignupActivity" android:exported="true" />
+
+        <!-- Admin & Employee Activities -->
         <activity android:name=".admin.AdminActivity" android:exported="true" />
         <activity android:name=".employee.EmployeeActivity" android:exported="true" />
 
+        <!-- Location Tracking Service (Runs in the background) -->
+        <service
+            android:name=".services.LocationTrackingService"
+            android:foregroundServiceType="location"
+            android:exported="false"/>
     </application>
 
 </manifest>

@@ -5,26 +5,22 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.widget.*;
+import android.content.Context;
+import androidx.core.content.ContextCompat;
 import com.example.app006.R;
 import com.example.app006.admin.AdminActivity;
 import com.example.app006.employee.EmployeeActivity;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
-import com.google.firebase.database.ValueEventListener;
+import com.example.app006.services.LocationTrackingService;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 public class LoginActivity extends AppCompatActivity {
-
     private EditText loginUsername, loginPassword;
     private Button loginButton;
     private TextView signupRedirectText;
     private SharedPreferences sharedPreferences;
+    private FirebaseFirestore db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,8 +33,9 @@ public class LoginActivity extends AppCompatActivity {
         signupRedirectText = findViewById(R.id.signupRedirectText);
 
         sharedPreferences = getSharedPreferences("LoginPrefs", MODE_PRIVATE);
+        db = FirebaseFirestore.getInstance();
 
-        if (isUserLoggedIn()) {
+        if (sharedPreferences.getBoolean("isLoggedIn", false)) {
             navigateToDashboard();
             return;
         }
@@ -49,16 +46,14 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
-        signupRedirectText.setOnClickListener(view -> startActivity(new Intent(LoginActivity.this, SignupActivity.class)));
-    }
-
-    private boolean isUserLoggedIn() {
-        return sharedPreferences.getBoolean("isLoggedIn", false);
+        signupRedirectText.setOnClickListener(view ->
+                startActivity(new Intent(LoginActivity.this, SignupActivity.class))
+        );
     }
 
     private boolean validateInputs() {
-        return validateField(loginUsername, "Username cannot be empty") &&
-                validateField(loginPassword, "Password cannot be empty");
+        return validateField(loginUsername, "Please enter your username") &&
+                validateField(loginPassword, "Please enter your password");
     }
 
     private boolean validateField(EditText field, String errorMessage) {
@@ -68,68 +63,69 @@ public class LoginActivity extends AppCompatActivity {
             field.requestFocus();
             return false;
         }
-        field.setError(null);
         return true;
+    }
+
+    private void navigateToDashboard() {
+        String role = sharedPreferences.getString("role", "");
+
+        if ("admin".equalsIgnoreCase(role)) {
+            startActivity(new Intent(LoginActivity.this, AdminActivity.class));
+        } else if ("employee".equalsIgnoreCase(role)) {
+            startActivity(new Intent(LoginActivity.this, EmployeeActivity.class));
+            startEmployeeTracking();
+        } else {
+            Toast.makeText(LoginActivity.this, "Unknown role. Please contact support.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        finish();
     }
 
     private void checkUser() {
         String userUsername = loginUsername.getText().toString().trim();
         String userPassword = loginPassword.getText().toString().trim();
 
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("users");
-        Query checkUserDatabase = reference.orderByChild("username").equalTo(userUsername);
+        db.collection("users").document(userUsername).get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        String passwordFromDB = documentSnapshot.getString("password");
+                        String userType = documentSnapshot.getString("userType");
 
-        checkUserDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.exists()) {
-                    for (DataSnapshot userSnapshot : snapshot.getChildren()) {
-                        String passwordFromDB = userSnapshot.child("password").getValue(String.class);
+                        if (passwordFromDB == null || userType == null) {
+                            Toast.makeText(LoginActivity.this, "Invalid user data. Contact support.", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
 
                         if (userPassword.equals(passwordFromDB)) {
-                            saveUserSession(userSnapshot);
+                            saveUserSession(documentSnapshot, userType);
                             navigateToDashboard();
                         } else {
-                            loginPassword.setError("Invalid Credentials");
+                            loginPassword.setError("Incorrect password");
                             loginPassword.requestFocus();
                         }
+                    } else {
+                        loginUsername.setError("User not found");
+                        loginUsername.requestFocus();
                     }
-                } else {
-                    loginUsername.setError("User does not exist");
-                    loginUsername.requestFocus();
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(LoginActivity.this, "Database error. Try again later.", Toast.LENGTH_SHORT).show();
-            }
-        });
+                })
+                .addOnFailureListener(e ->
+                        Toast.makeText(LoginActivity.this, "Database error. Please try again.", Toast.LENGTH_SHORT).show()
+                );
     }
 
-    private void saveUserSession(DataSnapshot userSnapshot) {
+    private void saveUserSession(DocumentSnapshot documentSnapshot, String userType) {
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putBoolean("isLoggedIn", true);
-        editor.putString("name", userSnapshot.child("name").getValue(String.class));
-        editor.putString("email", userSnapshot.child("email").getValue(String.class));
-        editor.putString("username", userSnapshot.child("username").getValue(String.class));
-        editor.putString("role", userSnapshot.child("userType").getValue(String.class));
+        editor.putString("name", documentSnapshot.getString("name"));
+        editor.putString("email", documentSnapshot.getString("email"));
+        editor.putString("username", documentSnapshot.getString("username"));
+        editor.putString("role", userType);
         editor.apply();
     }
 
-    private void navigateToDashboard() {
-        String role = sharedPreferences.getString("role", "");
-        Intent intent;
-        if ("Admin".equals(role)) {
-            intent = new Intent(LoginActivity.this, AdminActivity.class);
-        } else {
-            intent = new Intent(LoginActivity.this, EmployeeActivity.class);
-        }
-        intent.putExtra("name", sharedPreferences.getString("name", ""));
-        intent.putExtra("email", sharedPreferences.getString("email", ""));
-        intent.putExtra("username", sharedPreferences.getString("username", ""));
-        intent.putExtra("role", role);
-        startActivity(intent);
-        finish();
+    private void startEmployeeTracking() {
+        Intent intent = new Intent(this, LocationTrackingService.class);
+        ContextCompat.startForegroundService(this, intent);
+        ContextCompat.startForegroundService(this, intent);
     }
 }
