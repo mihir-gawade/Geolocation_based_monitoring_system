@@ -4,6 +4,16 @@
 
     <string name="open_nav">Open Navigation Drawer</string>
     <string name="close_nav">Close Navigation Drawer</string>
+    <string name="profile_image_desc">Profile Picture</string>
+    <string name="logout_button_label">Logout</string>
+    <string name="employee_name_label">Name: %1$s</string>
+    <string name="employee_email_label">Email: %1$s</string>
+    <string name="employee_role_label">Role: %1$s</string>
+    <string name="employee_username_label">Username: %1$s</string>
+    <string name="greeting_text">Good Morning, User!</string>
+
+
+
 
     <string-array name="user_types">
         <item>Select User Type</item>
