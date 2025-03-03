@@ -7,19 +7,21 @@ public class LeaveRequest {
     private String startDate;
     private String endDate;
     private String status; // Pending, Approved, Rejected
+    private String createdDate; // Date when the request is created
 
     public LeaveRequest() {
         // Default constructor required for Firebase or serialization
     }
 
     public LeaveRequest(String requestId, String employeeEmail, String reason,
-                        String startDate, String endDate, String status) {
+                        String startDate, String endDate, String status, String createdDate) {
         this.requestId = requestId;
         this.employeeEmail = employeeEmail;
         this.reason = reason;
         this.startDate = startDate;
         this.endDate = endDate;
         this.status = status;
+        this.createdDate = createdDate;
     }
 
     public String getRequestId() {
@@ -68,5 +70,13 @@ public class LeaveRequest {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public String getCreatedDate() {
+        return createdDate;
+    }
+
+    public void setCreatedDate(String createdDate) {
+        this.createdDate = createdDate;
     }
 }
