@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="@color/white">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Apply for Leave"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:textColor="@color/black"
+        android:paddingBottom="20dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+
+        android:padding="16dp"
+        android:elevation="4dp"
+        android:layout_marginBottom="16dp">
+
+        <EditText
+            android:id="@+id/leave_reason"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Enter reason for leave"
+            android:inputType="text"
+
+            android:padding="12dp"
+            android:textSize="16sp"/>
+
+        <Button
+            android:id="@+id/start_date_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Select Start Date"
+            android:backgroundTint="@color/black"
+            android:textColor="@color/white"
+            android:layout_marginTop="12dp" />
+
+        <Button
+            android:id="@+id/end_date_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Select End Date"
+            android:backgroundTint="@color/black"
+            android:textColor="@color/white"
+            android:layout_marginTop="8dp" />
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/apply_leave_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Apply Leave"
+        android:backgroundTint="@color/black"
+        android:textColor="@color/white"
+        android:padding="12dp"
+        android:textSize="18sp"
+        android:layout_marginTop="12dp" />
+
+    <TextView
+        android:id="@+id/leave_status"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Leave Status: Pending"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:textColor="@color/black"
+        android:gravity="center"
+        android:paddingTop="16dp" />
+
+</LinearLayout>

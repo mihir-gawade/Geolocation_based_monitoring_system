@@ -46,6 +46,7 @@ dependencies {
 
     // Google Play Services
     implementation(libs.play.services.location)
+    implementation(libs.firebase.database)
 
     // Testing dependencies
     testImplementation(libs.junit)

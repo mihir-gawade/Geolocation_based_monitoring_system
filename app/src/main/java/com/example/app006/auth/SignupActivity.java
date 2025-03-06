@@ -12,7 +12,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class SignupActivity extends AppCompatActivity {
-    EditText signupName, signupUsername, signupEmail, signupPassword, signupConfirmPassword;
+    EditText signupName, signupUsername, signupEmail, signupPassword, signupConfirmPassword, signupCompanyName;
     Spinner signupUserType;
     TextView loginRedirectText;
     Button signupButton;
@@ -28,6 +28,7 @@ public class SignupActivity extends AppCompatActivity {
         signupUsername = findViewById(R.id.signup_username);
         signupPassword = findViewById(R.id.signup_password);
         signupConfirmPassword = findViewById(R.id.signup_confirm_password);
+        signupCompanyName = findViewById(R.id.signup_companyName);
         signupUserType = findViewById(R.id.signup_user_type);
         loginRedirectText = findViewById(R.id.loginRedirectText);
         signupButton = findViewById(R.id.signup_button);
@@ -39,6 +40,9 @@ public class SignupActivity extends AppCompatActivity {
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, userTypes);
         signupUserType.setAdapter(adapter);
 
+
+
+
         signupButton.setOnClickListener(view -> {
             String name = signupName.getText().toString().trim();
             String email = signupEmail.getText().toString().trim();
@@ -46,18 +50,21 @@ public class SignupActivity extends AppCompatActivity {
             String password = signupPassword.getText().toString().trim();
             String confirmPassword = signupConfirmPassword.getText().toString().trim();
             String userType = signupUserType.getSelectedItem().toString();
+            String companyName = signupCompanyName.getText().toString().trim();
 
             if (name.isEmpty() || email.isEmpty() || username.isEmpty() || password.isEmpty() || confirmPassword.isEmpty() || userType.equals("Select User Type")) {
                 Toast.makeText(SignupActivity.this, "Please fill all fields!", Toast.LENGTH_SHORT).show();
                 return;
             }
 
+
+
             if (!password.equals(confirmPassword)) {
                 Toast.makeText(SignupActivity.this, "Passwords do not match!", Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            HelperClass user = new HelperClass(name, email, username, userType, password);
+            HelperClass user = new HelperClass(name, email, username, userType, password, companyName);
             db.collection("users").document(username).set(user)
                     .addOnSuccessListener(aVoid -> {
                         Toast.makeText(SignupActivity.this, "Signup Successful! 🎉", Toast.LENGTH_SHORT).show();
