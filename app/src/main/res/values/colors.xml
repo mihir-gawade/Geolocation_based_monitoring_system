@@ -9,6 +9,7 @@
     <color name="darkGrey">#616161</color>  <!-- Dark grey for text -->
     <color name="bright_red">#E63946</color> <!-- Bright red -->
     <color name="dark_red">#B71C1C</color> <!-- Dark red -->
-    <color name="light_red">#FFCDD2</color> <!-- Light red for ripple effect -->
+    <color name="light_red">#FFCDD2</color>
+    <color name="dark_background">#121212</color><!-- Light red for ripple effect -->
 
 </resources>
